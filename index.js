@@ -1,7 +1,7 @@
 import 'dotenv/config.js'
-import { App } from '@tinyhttp/app'
+import { createApi } from './api/create-api.js'
 
-const app = new App()
+const app = createApi()
 
 app.listen(process.env.PORT, () => {
   // eslint-disable-next-line no-console
