@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "lib": [
+      "es2020"
+    ],
+    "outDir": "build/",
+    "sourceMap": true
+  }
+}

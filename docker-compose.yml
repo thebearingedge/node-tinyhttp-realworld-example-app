@@ -1,0 +1,9 @@
+services:
+  postgres:
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_DB=realworld
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+    ports:
+      - 5432:5432

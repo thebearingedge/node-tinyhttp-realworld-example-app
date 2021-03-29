@@ -1,0 +1,47 @@
+{
+  "name": "tinyhttp-realworld",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "format": "eslint . --fix --ext=ts && prettier --write \"./**/*.ts\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "services:start": "docker-compose up -d --build",
+    "services:stop": "docker-compose down",
+    "prepare": "is-ci || husky install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thebearingedge/node-tinyhttp-realworld-example-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thebearingedge/node-tinyhttp-realworld-example-app/issues"
+  },
+  "homepage": "https://github.com/thebearingedge/node-tinyhttp-realworld-example-app#readme",
+  "dependencies": {
+    "@tinyhttp/app": "^1.2.20",
+    "@tinyhttp/cors": "^1.2.4",
+    "@tinyhttp/jwt": "^1.2.0",
+    "eta": "^1.12.1",
+    "milliparsec": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.37",
+    "@typescript-eslint/eslint-plugin": "^4.19.0",
+    "@typescript-eslint/parser": "^4.19.0",
+    "eslint": "^7.23.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "husky": "^5.2.0",
+    "is-ci": "^3.0.0",
+    "prettier": "^2.2.1",
+    "prisma": "^2.19.0",
+    "supertest-fetch": "^1.4.3",
+    "ts-node-dev": "^1.1.6",
+    "typescript": "^4.2.3",
+    "uvu": "^0.5.1"
+  }
+}

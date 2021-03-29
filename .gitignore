@@ -1,0 +1,6 @@
+.env
+*.log
+.DS_Store
+build/
+node_modules/
+docker-compose.override.yml
