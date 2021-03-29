@@ -1,17 +1,11 @@
 {
-  "parser": "@typescript-eslint/parser",
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/all",
     "prettier"
-  ],
-  "plugins": [
-    "@typescript-eslint"
   ],
   "parserOptions": {
     "ecmaVersion": 2020,
-    "sourceType": "module",
-    "project": "./tsconfig.json"
+    "sourceType": "module"
   },
   "env": {
     "node": true,
@@ -23,11 +17,6 @@
       {
         "allow": ["error"]
       }
-    ],
-    "@typescript-eslint/no-type-alias": "off",
-    "@typescript-eslint/consistent-type-definitions": [
-      "error",
-      "type"
     ]
   }
 }
