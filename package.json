@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
+    "start": "node .",
     "format": "eslint . --fix && prettier --write \"./**/*.js\"",
     "test": "echo \"Error: no test specified\" && exit 1",
     "services:start": "docker-compose up -d --build",
     "services:stop": "docker-compose down",
     "db:up": "prisma migrate dev --name",
     "db:reset": "prisma migrate reset",
-    "prepare": "is-ci || husky install"
+    "postinstall": "is-ci || husky install"
   },
   "repository": {
     "type": "git",
@@ -28,11 +30,11 @@
     "@tinyhttp/app": "^1.2.20",
     "@tinyhttp/cors": "^1.2.4",
     "@tinyhttp/jwt": "^1.2.0",
+    "dotenv": "^8.2.0",
     "eta": "^1.12.1",
     "milliparsec": "^2.0.2"
   },
   "devDependencies": {
-    "@types/node": "^14.14.37",
     "eslint": "^7.23.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
