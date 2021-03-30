@@ -6,4 +6,16 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password
     ports:
-      - 5432:5432
+      - "5432:5432"
+  pgweb:
+    container_name: pgweb
+    restart: always
+    image: sosedoff/pgweb
+    ports:
+      - "8081:8081"
+    links:
+      - postgres:postgres
+    environment:
+      - DATABASE_URL=postgres://admin:password@postgres/realworld?sslmode=disable
+    depends_on:
+      - postgres

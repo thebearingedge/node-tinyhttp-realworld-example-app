@@ -11,10 +11,72 @@ generator client {
 }
 
 model User {
-  userId   String @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
-  email    String @unique
-  username String @unique
-  password String
+  userId    Int        @id     @default(autoincrement())
+  email     String     @unique
+  password  String
+  profile   Profile?
+  favorites Favorite[]
+}
+
+model Follow {
+  followerId  Int
+  followingId Int
+  @@id([followerId, followingId])
+}
+
+model Profile {
+  userId   Int       @unique
+  username String    @unique
   bio      String?
   image    String?
+  user     User      @relation(fields: userId, references: userId)
+  articles Article[]
+  comments Comment[]
+}
+
+model Favorite {
+  userId    Int
+  articleId Int
+  user      User    @relation(fields: userId, references: userId)
+  article   Article @relation(fields: articleId, references: articleId)
+  @@id([userId, articleId])
+}
+
+model Article {
+  articleId   Int          @id @default(autoincrement())
+  userId      Int
+  slug        String       @unique
+  title       String
+  description String
+  body        String
+  createdAt   DateTime     @db.Timestamptz(6) @default(dbgenerated("now()"))
+  updatedAt   DateTime     @db.Timestamptz(6) @default(dbgenerated("now()"))
+  author      Profile      @relation(fields: userId, references: userId)
+  comments    Comment[]
+  favoritedBy Favorite[]
+  articleTags ArticleTag[]
+}
+
+model Tag {
+  value       String @id
+  articleTags ArticleTag[]
+}
+
+model ArticleTag {
+  articleId Int
+  tagValue  String
+  article   Article @relation(fields: articleId, references: articleId)
+  tag       Tag     @relation(fields: tagValue, references: value)
+  @@id([articleId, tagValue])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  body      String
+  articleId Int
+  createdAt DateTime @db.Timestamptz(6) @default(dbgenerated("now()"))
+  updatedAt DateTime @db.Timestamptz(6) @default(dbgenerated("now()"))
+  author    Profile  @relation(fields: userId, references: userId)
+  article   Article  @relation(fields: articleId, references: articleId)
 }
