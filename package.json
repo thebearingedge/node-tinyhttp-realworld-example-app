@@ -9,7 +9,9 @@
     "dev": "nodemon -w index.js -w api/ .",
     "lint": "eslint . --fix",
     "format": "prettier --write \"./**/*.js\"",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "uvu api/ '\\.test\\.js$'",
+    "tdd": "watchlist api/ -- npm test",
+    "cover": "c8 -r text -r html -n api/ npm test",
     "services:start": "docker-compose up -d --build",
     "services:stop": "docker-compose down",
     "db:push": "prisma --preview-feature db push",
@@ -38,6 +40,7 @@
     "milliparsec": "^2.0.2"
   },
   "devDependencies": {
+    "c8": "^7.7.0",
     "eslint": "^7.23.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
@@ -47,6 +50,7 @@
     "prettier": "^2.2.1",
     "prisma": "^2.19.0",
     "supertest-fetch": "^1.4.3",
-    "uvu": "^0.5.1"
+    "uvu": "^0.5.1",
+    "watchlist": "^0.2.3"
   }
 }
