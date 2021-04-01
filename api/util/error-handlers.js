@@ -1,8 +1,12 @@
-import ajv from 'ajv'
+import Ajv from 'ajv'
 
 export const onError = (err, req, res) => {
-  if (err instanceof ajv.ValidationError) {
-    res.status(422).json({})
+  if (err instanceof Ajv.ValidationError) {
+    res.status(422).json({
+      errors: {
+        body: err.errors.map(({ message }) => message)
+      }
+    })
   } else {
     console.error(err)
     res.status(500).json({

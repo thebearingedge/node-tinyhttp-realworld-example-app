@@ -14,7 +14,11 @@ export const suite = (name, context, register) => {
     context = undefined
   }
 
-  const test = uvuSuite(name, context)
+  const test = uvuSuite(name, {
+    ...context,
+    db,
+    client
+  })
 
   test.after(async () => {
     server.close()
@@ -28,7 +32,7 @@ export const suite = (name, context, register) => {
     await db.$transaction(deletions)
   })
 
-  register({ test, db, client })
+  register(test)
 
   test.run()
 }
