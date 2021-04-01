@@ -15,7 +15,7 @@
     "services:start": "docker-compose up -d --build",
     "services:stop": "docker-compose down",
     "db:push": "prisma --preview-feature db push",
-    "postinstall": "is-ci || husky install"
+    "postinstall": "prisma generate && is-ci || husky install"
   },
   "repository": {
     "type": "git",

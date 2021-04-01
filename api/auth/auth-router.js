@@ -1,7 +1,7 @@
-import { App } from '@tinyhttp/app'
+import { createRouter } from '../util/create-router.js'
 
-export const authRouter = new App()
-  .post('/users/login', async (req, res) => {})
-  .post('/users', async (req, res) => {})
-  .get('/user', async (req, res) => {})
-  .put('/user', async (req, res) => {})
+export const authRouter = createRouter()
+  .post('/api/users/login', async (req, res) => {})
+  .post('/api/users', async (req, res) => {})
+  .get('/api/user', async (req, res) => {})
+  .put('/api/user', async (req, res) => {})

@@ -1,6 +1,6 @@
-import { App } from '@tinyhttp/app'
+import { createRouter } from '../util/create-router.js'
 
-export const profilesRouter = new App()
-  .get('/profiles/:username', async (req, res) => {})
-  .post('/profiles/:username/follow', async (req, res) => {})
-  .delete('/profiles/:username/follow', async (req, res) => {})
+export const profilesRouter = createRouter()
+  .get('/api/profiles/:username', async (req, res) => {})
+  .post('/api/profiles/:username/follow', async (req, res) => {})
+  .delete('/api/profiles/:username/follow', async (req, res) => {})

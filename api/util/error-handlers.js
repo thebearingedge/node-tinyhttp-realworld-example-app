@@ -1,7 +1,7 @@
-// import { ValidationError } from 'ajv'
+import ajv from 'ajv'
 
 export const onError = (err, req, res) => {
-  if (err instanceof Error) {
+  if (err instanceof ajv.ValidationError) {
     res.status(422).json({})
   } else {
     console.error(err)
@@ -13,6 +13,6 @@ export const onError = (err, req, res) => {
 
 export const noMatchHandler = (req, res) => {
   res.status(404).json({
-    error: `cannot ${req.method} ${req.url}`
+    error: `cannot ${req.method} ${req.originalUrl}`
   })
 }
