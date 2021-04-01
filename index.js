@@ -1,11 +1,9 @@
 import 'dotenv/config.js'
 import { createApi } from './api/create-api.js'
-import { PrismaClient } from '@prisma/client'
+import Prisma from '@prisma/client'
 
-const app = createApi()
-const db = new PrismaClient()
-
-app.locals.db = db
+const prisma = new Prisma.PrismaClient()
+const app = createApi(prisma)
 
 app.listen(process.env.PORT, () => {
   // eslint-disable-next-line no-console
