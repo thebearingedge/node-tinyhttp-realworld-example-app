@@ -3,11 +3,10 @@ import ajvErrors from 'ajv-errors'
 import { App } from '@tinyhttp/app'
 import { cors } from '@tinyhttp/cors'
 import { json } from 'milliparsec'
-import { tagsRouter } from './tags/tags-router.js'
+import { tagRoutes } from './tag/tag-routes.js'
 import { authRoutes } from './auth/auth-routes.js'
-import { profilesRouter } from './profiles/profiles-router.js'
-import { articlesRouter } from './articles/articles-router.js'
-import { onError, noMatchHandler } from './util/error-handlers.js'
+import { profileRoutes } from './profile/profile-routes.js'
+import { articleRoutes } from './article/article-routes.js'
 
 export function createApi() {
   const ajv = ajvErrors(new Ajv({ allErrors: true }))
@@ -21,6 +20,30 @@ export function createApi() {
   app.use(json())
 
   authRoutes(app, ajv)
+  profileRoutes(app, ajv)
+  articleRoutes(app, ajv)
+  tagRoutes(app, ajv)
 
   return app
+}
+
+const onError = (err, req, res) => {
+  if (err instanceof Ajv.ValidationError) {
+    res.status(422).json({
+      errors: {
+        body: err.errors.map(({ message }) => message)
+      }
+    })
+  } /* c8 ignore start */ else {
+    console.error(err)
+    res.status(500).json({
+      error: 'an unexpected error occurred'
+    })
+  } /* c8 ignore stop */
+}
+
+const noMatchHandler = (req, res) => {
+  res.status(404).json({
+    error: `cannot ${req.method} ${req.url}`
+  })
 }

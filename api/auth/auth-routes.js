@@ -1,6 +1,6 @@
 import { registration } from './auth-schemas.js'
 
-export function authRoutes(app, ajv) {
+export const authRoutes = (app, ajv) => {
   const validateRegistration = ajv.compile(registration)
   app
     .post('/api/users/login', async (req, res) => {})

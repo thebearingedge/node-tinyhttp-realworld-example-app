@@ -11,7 +11,7 @@
     "lint:staged": "lint-staged",
     "test": "uvu api/ '\\.test\\.js$'",
     "tdd": "npm -s t; watchlist api/ -- npm -s t",
-    "cover": "c8 -r text -r html -x **/test-suite.js -n api/ npm -s t",
+    "cover": "c8 -a -r text -r html -x **/test-suite.js -n api/ npm -s t",
     "services:start": "docker-compose up -d --build",
     "services:stop": "docker-compose down",
     "db:push": "prisma --preview-feature db push",

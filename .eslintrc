@@ -18,6 +18,12 @@
     "prettier/prettier": [
       "error"
     ],
+    "no-unused-vars": [
+      "error",
+      {
+        "args": "none"
+      }
+    ],
     "no-console": [
       "error",
       {
