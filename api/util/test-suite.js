@@ -1,35 +1,36 @@
-import prisma from '@prisma/client'
+import Prisma from '@prisma/client'
 import { suite as uvuSuite } from 'uvu'
 import { makeFetch } from 'supertest-fetch'
 import { createApi } from '../create-api.js'
 
-const db = new prisma.PrismaClient()
-const app = createApi()
+const prisma = new Prisma.PrismaClient()
+const app = createApi(prisma)
 const server = app.listen()
 const client = makeFetch(server)
 
-export const suite = (name, context, register) => {
+const entities = ['profile', 'user']
+
+export const suite = (suiteName, context, register) => {
   if (typeof register === 'undefined') {
     register = context
     context = undefined
   }
 
-  const test = uvuSuite(name, {
+  const test = uvuSuite(suiteName, {
     ...context,
-    db,
+    prisma,
     client
   })
 
   test.after(async () => {
     server.close()
-    await db.$disconnect()
+    await prisma.$disconnect()
   })
 
   test.before.each(async () => {
-    const deletions = Object.keys(db)
-      .filter(key => !key.startsWith('_'))
-      .map(entity => db[entity].deleteMany())
-    await db.$transaction(deletions)
+    for (const entity of entities) {
+      await prisma[entity].deleteMany()
+    }
   })
 
   register(test)

@@ -11,7 +11,7 @@ generator client {
 }
 
 model User {
-  userId    Int        @id     @default(autoincrement())
+  userId    Int        @id @default(autoincrement())
   email     String     @unique
   password  String
   profile   Profile?
@@ -21,6 +21,7 @@ model User {
 model Follow {
   followerId  Int
   followingId Int
+
   @@id([followerId, followingId])
 }
 
@@ -39,6 +40,7 @@ model Favorite {
   articleId Int
   user      User    @relation(fields: userId, references: userId)
   article   Article @relation(fields: articleId, references: articleId)
+
   @@id([userId, articleId])
 }
 
@@ -49,8 +51,8 @@ model Article {
   title       String
   description String
   body        String
-  createdAt   DateTime     @db.Timestamptz(6) @default(dbgenerated("now()"))
-  updatedAt   DateTime     @db.Timestamptz(6) @default(dbgenerated("now()"))
+  createdAt   DateTime     @default(dbgenerated("now()")) @db.Timestamptz(6)
+  updatedAt   DateTime     @default(dbgenerated("now()")) @db.Timestamptz(6)
   author      Profile      @relation(fields: userId, references: userId)
   comments    Comment[]
   favoritedBy Favorite[]
@@ -58,7 +60,7 @@ model Article {
 }
 
 model Tag {
-  value       String @id
+  value       String       @id
   articleTags ArticleTag[]
 }
 
@@ -67,6 +69,7 @@ model ArticleTag {
   tagValue  String
   article   Article @relation(fields: articleId, references: articleId)
   tag       Tag     @relation(fields: tagValue, references: value)
+
   @@id([articleId, tagValue])
 }
 
@@ -75,8 +78,8 @@ model Comment {
   userId    Int
   body      String
   articleId Int
-  createdAt DateTime @db.Timestamptz(6) @default(dbgenerated("now()"))
-  updatedAt DateTime @db.Timestamptz(6) @default(dbgenerated("now()"))
+  createdAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(6)
+  updatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(6)
   author    Profile  @relation(fields: userId, references: userId)
   article   Article  @relation(fields: articleId, references: articleId)
 }

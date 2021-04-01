@@ -8,7 +8,7 @@ import { authRoutes } from './auth/auth-routes.js'
 import { profileRoutes } from './profile/profile-routes.js'
 import { articleRoutes } from './article/article-routes.js'
 
-export function createApi() {
+export function createApi(prisma) {
   const ajv = ajvErrors(new Ajv({ allErrors: true }))
 
   const app = new App({
@@ -19,10 +19,10 @@ export function createApi() {
   app.use(cors())
   app.use(json())
 
-  authRoutes(app, ajv)
-  profileRoutes(app, ajv)
-  articleRoutes(app, ajv)
-  tagRoutes(app, ajv)
+  authRoutes(app, ajv, prisma)
+  profileRoutes(app, ajv, prisma)
+  articleRoutes(app, ajv, prisma)
+  tagRoutes(app, ajv, prisma)
 
   return app
 }
