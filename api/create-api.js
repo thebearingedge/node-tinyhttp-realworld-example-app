@@ -12,14 +12,12 @@ export function createApi() {
     noMatchHandler
   })
 
-  app.use(
-    '/api',
-    cors(),
-    authRouter,
-    tagsRouter,
-    articlesRouter,
-    profilesRouter
-  )
+  app.use(cors())
+  app.use(tagsRouter)
+  app.use(authRouter)
+  app.use(profilesRouter)
+  app.use(articlesRouter)
+  app.use(noMatchHandler)
 
   return app
 }
