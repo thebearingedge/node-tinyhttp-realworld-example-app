@@ -10,8 +10,8 @@
     "lint": "eslint . --fix",
     "format": "prettier --write \"./**/*.js\"",
     "test": "uvu api/ '\\.test\\.js$'",
-    "tdd": "watchlist api/ -- npm test",
-    "cover": "c8 -r text -r html -n api/ npm test",
+    "tdd": "npm run -s test && watchlist api/ -- npm run -s test",
+    "cover": "c8 -r text -r html -n api/ npm runs -s test",
     "services:start": "docker-compose up -d --build",
     "services:stop": "docker-compose down",
     "db:push": "prisma --preview-feature db push",
@@ -35,6 +35,7 @@
     "@tinyhttp/jwt": "^1.2.0",
     "ajv": "^8.0.1",
     "ajv-errors": "^3.0.0",
+    "argon2": "^0.27.2",
     "dotenv": "^8.2.0",
     "eta": "^1.12.1",
     "milliparsec": "^2.0.2"
