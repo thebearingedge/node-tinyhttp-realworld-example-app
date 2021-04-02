@@ -1,19 +1,20 @@
 import fs from 'fs'
+import Ajv from 'ajv'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import Ajv from 'ajv'
 import ajvErrors from 'ajv-errors'
-import { App } from '@tinyhttp/app'
-import { cors } from '@tinyhttp/cors'
 import { json } from 'milliparsec'
+import { App } from '@tinyhttp/app'
+import { jwt } from '@tinyhttp/jwt'
+import { cors } from '@tinyhttp/cors'
 import { tagRoutes } from './tag/tag-routes.js'
 import { authRoutes } from './auth/auth-routes.js'
 import { profileRoutes } from './profile/profile-routes.js'
 import { articleRoutes } from './article/article-routes.js'
 
-const pathToSwagger = fileURLToPath(path.dirname(import.meta.url))
+const pathToSwaggerJSON = fileURLToPath(path.dirname(import.meta.url))
 const swaggerJSON = fs.readFileSync(
-  path.join(pathToSwagger, 'swagger.json'),
+  path.join(pathToSwaggerJSON, 'swagger.json'),
   'utf8'
 )
 const swagger = JSON.parse(swaggerJSON)
@@ -32,7 +33,7 @@ const ajv = ajvErrors(
       'paths'
     ],
     formats: {
-      password: val => !!val && typeof val === 'string'
+      password: val => !!val.length
     }
   })
 )
@@ -47,6 +48,12 @@ export function createApi(prisma) {
 
   app.use(cors())
   app.use(json())
+  app.use(
+    jwt({
+      algorithm: 'HS256',
+      secret: process.env.TOKEN_SECRET
+    })
+  )
 
   authRoutes(app, ajv, prisma)
   profileRoutes(app, ajv, prisma)

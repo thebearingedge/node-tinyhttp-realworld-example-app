@@ -2,6 +2,7 @@ import { hash, verify } from 'argon2'
 import jwt from 'jsonwebtoken'
 import { pick } from '../util/pick.js'
 import { validateBody } from '../util/validate.js'
+import { requireAuth } from '../util/require-auth.js'
 
 export const authRoutes = (app, ajv, prisma) => {
   const validateRegistration = validateBody(
@@ -89,6 +90,26 @@ export const authRoutes = (app, ajv, prisma) => {
         }
       })
     })
-    .get('/api/user', async (req, res) => {})
+    .get('/api/user', requireAuth, async (req, res) => {
+      const { id } = req.user
+      const { email, profile } = await prisma.user.findUnique({
+        where: { id },
+        select: {
+          email: true,
+          profile: {
+            username: true,
+            bio: true,
+            image: true
+          }
+        }
+      })
+      res.json({
+        user: {
+          email,
+          token: req.get('Authorization').replace('Token ', ''),
+          ...pick(profile, ['username, bio, image'])
+        }
+      })
+    })
     .put('/api/user', async (req, res) => {})
 }
