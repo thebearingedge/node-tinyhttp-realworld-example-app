@@ -3,24 +3,24 @@ import jwt from 'jsonwebtoken'
 import { suite } from '../util/test-suite.js'
 
 suite('current user: GET /api/user', test => {
-  test('requires an access token', async ({ client }) => {
-    await client('/api/user').expect(401, {
+  test('requires an access token', async ({ fetch }) => {
+    await fetch('/api/user').expect(401, {
       error: 'authentication required'
     })
   })
 
-  test('requires a valid token', async ({ client }) => {
+  test('requires a valid token', async ({ fetch }) => {
     const req = {
       headers: {
         Authorization: 'fake token'
       }
     }
-    await client('/api/user', req).expect(401, {
+    await fetch('/api/user', req).expect(401, {
       error: 'authentication required'
     })
   })
 
-  test('returns a User', async ({ prisma, client }) => {
+  test('returns the user', async ({ prisma, fetch }) => {
     const { userId } = await prisma.user.create({
       data: {
         email: 'test@test.test',
@@ -38,7 +38,7 @@ suite('current user: GET /api/user', test => {
         Authorization: `Token ${token}`
       }
     }
-    await client('/api/user', req).expect(200, {
+    await fetch('/api/user', req).expect(200, {
       user: {
         email: 'test@test.test',
         username: 'test',

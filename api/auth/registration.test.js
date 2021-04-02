@@ -2,32 +2,32 @@ import * as assert from 'uvu/assert'
 import { suite } from '../util/test-suite.js'
 
 suite('registration: POST /api/user', test => {
-  test('requires a user', async ({ client }) => {
+  test('requires a user', async ({ fetch }) => {
     const req = {
       method: 'post',
       headers: {
-        'content-type': 'application/json'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({})
     }
-    await client('/api/user', req).expect(422, {
+    await fetch('/api/user', req).expect(422, {
       errors: {
         body: ["must have required property 'user'"]
       }
     })
   })
 
-  test('requires a username, email, and password', async ({ client }) => {
+  test('requires a username, email, and password', async ({ fetch }) => {
     const req = {
       method: 'post',
       headers: {
-        'content-type': 'application/json'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         user: {}
       })
     }
-    await client('/api/user', req).expect(422, {
+    await fetch('/api/user', req).expect(422, {
       errors: {
         body: [
           "must have required property 'username'",
@@ -38,11 +38,11 @@ suite('registration: POST /api/user', test => {
     })
   })
 
-  test('returns a User', async ({ client }) => {
+  test('returns the user', async ({ fetch }) => {
     const req = {
       method: 'post',
       headers: {
-        'content-type': 'application/json'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         user: {
@@ -52,7 +52,7 @@ suite('registration: POST /api/user', test => {
         }
       })
     }
-    const res = await client('/api/user', req).expect(201)
+    const res = await fetch('/api/user', req).expect(201)
     const { user } = await res.json()
     assert.is(user.email, 'test@test.test')
     assert.is(user.username, 'test')

@@ -6,7 +6,7 @@ import { createApi } from '../create-api.js'
 const prisma = new Prisma.PrismaClient()
 const app = createApi(prisma)
 const server = app.listen()
-const client = makeFetch(server)
+const fetch = makeFetch(server)
 
 const entities = ['profile', 'user']
 
@@ -19,7 +19,7 @@ export const suite = (suiteName, context, register) => {
   const test = uvuSuite(suiteName, {
     ...context,
     prisma,
-    client
+    fetch
   })
 
   test.after(async () => {
