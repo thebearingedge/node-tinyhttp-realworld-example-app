@@ -1,18 +1,69 @@
-import { hash } from 'argon2'
+import { hash, verify } from 'argon2'
 import jwt from 'jsonwebtoken'
 import { pick } from '../util/pick.js'
-import { registration } from './auth-schemas.js'
+import { validateBody } from '../util/validate.js'
 
 export const authRoutes = (app, ajv, prisma) => {
-  const validateRegistration = ajv.compile(registration)
+  const validateRegistration = validateBody(
+    ajv.compile({
+      $ref: 'swagger.json#/definitions/NewUserRequest'
+    })
+  )
+
+  const validateLogin = validateBody(
+    ajv.compile({
+      $ref: 'swagger.json#/definitions/LoginUserRequest'
+    })
+  )
+
   app
-    .post('/api/users/login', async (req, res) => {})
-    .post('/api/user', async (req, res) => {
-      await validateRegistration(req.body)
+    .post('/api/users/login', validateLogin, async (req, res) => {
+      const {
+        user: { email, password: unhashed }
+      } = req.body
+
+      const user = await prisma.user.findUnique({
+        where: { email },
+        include: {
+          profile: true
+        }
+      })
+
+      if (!user) {
+        res.status(401).json({
+          error: 'invalid login'
+        })
+        return
+      }
+
+      const { id, password: hashed, profile } = user
+
+      const isAuthenticated = await verify(hashed, unhashed)
+
+      if (!isAuthenticated) {
+        res.status(401).json({
+          error: 'invalid login'
+        })
+        return
+      }
+
+      const token = jwt.sign({ id }, process.env.TOKEN_SECRET)
+
+      res.status(201).json({
+        user: {
+          email,
+          token,
+          ...pick(profile, ['username', 'bio', 'image'])
+        }
+      })
+    })
+    .post('/api/user', validateRegistration, async (req, res) => {
       const {
         user: { email, username, password: unhashed }
       } = req.body
+
       const password = await hash(unhashed)
+
       const { id, profile } = await prisma.user.create({
         data: {
           email,
@@ -27,11 +78,12 @@ export const authRoutes = (app, ajv, prisma) => {
           profile: true
         }
       })
+
       const token = jwt.sign({ id }, process.env.TOKEN_SECRET)
+
       res.status(201).json({
         user: {
           email,
-          username,
           token,
           ...pick(profile, ['username', 'bio', 'image'])
         }

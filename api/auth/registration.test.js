@@ -1,7 +1,7 @@
-import { suite } from '../util/test-suite.js'
 import * as assert from 'uvu/assert'
+import { suite } from '../util/test-suite.js'
 
-suite('auth: POST /api/user', test => {
+suite('register: POST /api/user', test => {
   test('requires a user', async ({ client }) => {
     const req = {
       method: 'post',
@@ -30,8 +30,8 @@ suite('auth: POST /api/user', test => {
     await client('/api/user', req).expect(422, {
       errors: {
         body: [
-          "must have required property 'email'",
           "must have required property 'username'",
+          "must have required property 'email'",
           "must have required property 'password'"
         ]
       }
