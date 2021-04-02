@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { hash, verify } from 'argon2'
 import { json } from 'milliparsec'
-import { pick } from '../util/pick.js'
 import { validateBody } from '../util/validate.js'
 import { requireAuth } from '../util/require-auth.js'
 
@@ -28,8 +27,16 @@ export const authRoutes = (app, ajv, prisma) => {
 
       const user = await prisma.user.findUnique({
         where: { email },
-        include: {
-          profile: true
+        select: {
+          userId: true,
+          password: true,
+          profile: {
+            select: {
+              username: true,
+              bio: true,
+              image: true
+            }
+          }
         }
       })
 
@@ -40,7 +47,7 @@ export const authRoutes = (app, ajv, prisma) => {
         return
       }
 
-      const { id, password: hashed, profile } = user
+      const { userId, password: hashed, profile } = user
 
       const isAuthenticated = await verify(hashed, unhashed)
 
@@ -51,13 +58,13 @@ export const authRoutes = (app, ajv, prisma) => {
         return
       }
 
-      const token = jwt.sign({ id }, process.env.TOKEN_SECRET)
+      const token = jwt.sign({ userId }, process.env.TOKEN_SECRET)
 
       res.status(201).json({
         user: {
           email,
           token,
-          ...pick(profile, ['username', 'bio', 'image'])
+          ...profile
         }
       })
     })
