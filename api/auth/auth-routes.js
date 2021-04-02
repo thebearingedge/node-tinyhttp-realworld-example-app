@@ -1,8 +1,11 @@
-import { hash, verify } from 'argon2'
 import jwt from 'jsonwebtoken'
+import { hash, verify } from 'argon2'
+import { json } from 'milliparsec'
 import { pick } from '../util/pick.js'
 import { validateBody } from '../util/validate.js'
 import { requireAuth } from '../util/require-auth.js'
+
+const parseJSON = json()
 
 export const authRoutes = (app, ajv, prisma) => {
   const validateRegistration = validateBody(
@@ -18,7 +21,7 @@ export const authRoutes = (app, ajv, prisma) => {
   )
 
   app
-    .post('/api/users/login', validateLogin, async (req, res) => {
+    .post('/api/users/login', parseJSON, validateLogin, async (req, res) => {
       const {
         user: { email, password: unhashed }
       } = req.body
@@ -58,14 +61,14 @@ export const authRoutes = (app, ajv, prisma) => {
         }
       })
     })
-    .post('/api/user', validateRegistration, async (req, res) => {
+    .post('/api/user', parseJSON, validateRegistration, async (req, res) => {
       const {
         user: { email, username, password: unhashed }
       } = req.body
 
       const password = await hash(unhashed)
 
-      const { id, profile } = await prisma.user.create({
+      const { userId, profile } = await prisma.user.create({
         data: {
           email,
           password,
@@ -75,41 +78,54 @@ export const authRoutes = (app, ajv, prisma) => {
             }
           }
         },
-        include: {
-          profile: true
+        select: {
+          userId: true,
+          profile: {
+            select: {
+              username: true,
+              bio: true,
+              image: true
+            }
+          }
         }
       })
 
-      const token = jwt.sign({ id }, process.env.TOKEN_SECRET)
+      const token = jwt.sign({ userId }, process.env.TOKEN_SECRET)
 
       res.status(201).json({
         user: {
           email,
           token,
-          ...pick(profile, ['username', 'bio', 'image'])
+          ...profile
         }
       })
     })
     .get('/api/user', requireAuth, async (req, res) => {
-      const { id } = req.user
+      const { userId } = req.user
+
       const { email, profile } = await prisma.user.findUnique({
-        where: { id },
+        where: { userId },
         select: {
           email: true,
           profile: {
-            username: true,
-            bio: true,
-            image: true
+            select: {
+              username: true,
+              bio: true,
+              image: true
+            }
           }
         }
       })
+
+      const token = req.get('Authorization').replace('Token ', '')
+
       res.json({
         user: {
           email,
-          token: req.get('Authorization').replace('Token ', ''),
-          ...pick(profile, ['username, bio, image'])
+          token,
+          ...profile
         }
       })
     })
-    .put('/api/user', async (req, res) => {})
+    .put('/api/user', parseJSON, async (req, res) => {})
 }

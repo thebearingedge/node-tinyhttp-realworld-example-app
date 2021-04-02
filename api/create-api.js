@@ -3,7 +3,6 @@ import Ajv from 'ajv'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import ajvErrors from 'ajv-errors'
-import { json } from 'milliparsec'
 import { App } from '@tinyhttp/app'
 import { jwt } from '@tinyhttp/jwt'
 import { cors } from '@tinyhttp/cors'
@@ -47,7 +46,6 @@ export function createApi(prisma) {
   })
 
   app.use(cors())
-  app.use(json())
   app.use(
     jwt({
       algorithm: 'HS256',
