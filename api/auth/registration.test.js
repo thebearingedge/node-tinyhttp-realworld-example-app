@@ -1,5 +1,5 @@
 import * as assert from 'uvu/assert'
-import { suite } from '../util/test-suite.js'
+import { suite } from '../util/suite.test.js'
 
 suite('registration: POST /api/user', test => {
   test('requires a user', async ({ fetch }) => {

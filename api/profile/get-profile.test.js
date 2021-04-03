@@ -1,6 +1,6 @@
 import { hash } from 'argon2'
 import jwt from 'jsonwebtoken'
-import { suite } from '../util/test-suite.js'
+import { suite } from '../util/suite.test.js'
 
 suite('get profile: GET /api/profiles/:username', test => {
   let firstUser

@@ -11,12 +11,12 @@
     "lint:staged": "lint-staged",
     "test": "uvu api/ '\\.test\\.js$'",
     "tdd": "npm -s t; watchlist api/ -- npm -s t",
-    "cover": "c8 -a -r text -r html -x **/test-suite.js -n api/ npm -s t",
-    "db:start": "docker-compose up -d --build",
-    "db:stop": "docker-compose down",
+    "cover": "c8 -a -r text -r html -x **/*.test.js -n api/ npm -s t",
+    "db:start": "docker compose up -d --build",
+    "db:stop": "docker compose down",
     "db:push": "prisma --preview-feature db push",
     "db:reset": "prisma migrate reset --force",
-    "db:shell": "docker-compose exec postgres psql",
+    "db:shell": "docker compose exec postgres psql",
     "postinstall": "prisma generate && is-ci || husky install"
   },
   "lint-staged": {

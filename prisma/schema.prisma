@@ -20,13 +20,12 @@ model User {
 }
 
 model Follow {
-  followId  Int     @id @default(autoincrement())
   userId    Int
   profileId Int
-  user      User    @relation(fields: [userId], references: [userId])
-  profile   Profile @relation(fields: [profileId], references: [userId])
+  user      User    @relation(fields: userId, references: userId)
+  profile   Profile @relation(fields: profileId, references: userId)
 
-  @@unique([profileId, userId])
+  @@id([profileId, userId])
 }
 
 model Profile {

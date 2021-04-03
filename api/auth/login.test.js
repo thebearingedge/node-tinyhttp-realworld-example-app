@@ -1,6 +1,6 @@
 import { hash } from 'argon2'
 import * as assert from 'uvu/assert'
-import { suite } from '../util/test-suite.js'
+import { suite } from '../util/suite.test.js'
 
 suite('login: POST /api/users/login', test => {
   test('requires a user', async ({ fetch }) => {

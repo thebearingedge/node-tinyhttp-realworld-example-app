@@ -1,9 +1,9 @@
 import { hash } from 'argon2'
 import jwt from 'jsonwebtoken'
-import { suite } from '../util/test-suite.js'
+import { suite } from '../util/suite.test.js'
 
 suite('current user: GET /api/user', test => {
-  test('requires an access token', async ({ fetch }) => {
+  test('requires authentication', async ({ fetch }) => {
     await fetch('/api/user').expect(401, {
       error: 'authentication required'
     })
