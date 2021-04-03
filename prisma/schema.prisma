@@ -14,25 +14,30 @@ model User {
   userId    Int        @id @default(autoincrement())
   email     String     @unique
   password  String
+  follows   Follow[]
   profile   Profile?
   favorites Favorite[]
 }
 
 model Follow {
-  followerId  Int
-  followingId Int
+  followId  Int     @id @default(autoincrement())
+  userId    Int
+  profileId Int
+  user      User    @relation(fields: [userId], references: [userId])
+  profile   Profile @relation(fields: [profileId], references: [userId])
 
-  @@id([followerId, followingId])
+  @@unique([profileId, userId])
 }
 
 model Profile {
-  userId   Int       @unique
-  username String    @unique
-  bio      String?
-  image    String?
-  user     User      @relation(fields: userId, references: userId)
-  articles Article[]
-  comments Comment[]
+  userId    Int       @unique
+  username  String    @unique
+  bio       String?
+  image     String?
+  user      User      @relation(fields: userId, references: userId)
+  followers Follow[]
+  articles  Article[]
+  comments  Comment[]
 }
 
 model Favorite {

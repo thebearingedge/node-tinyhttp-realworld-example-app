@@ -42,8 +42,8 @@ export const authRoutes = (app, ajv, prisma) => {
     const token = jwt.sign({ userId }, process.env.TOKEN_SECRET)
     res.status(201).json({
       user: {
-        email,
         token,
+        email,
         ...profile
       }
     })
@@ -99,7 +99,6 @@ export const authRoutes = (app, ajv, prisma) => {
 
   app.get('/api/user', requireAuth, async (req, res) => {
     const { userId } = req.user
-    const token = req.get('Authorization').replace('Token ', '')
     const { email, profile } = await prisma.user.findUnique({
       where: { userId },
       select: {
@@ -113,6 +112,7 @@ export const authRoutes = (app, ajv, prisma) => {
         }
       }
     })
+    const token = req.get('Authorization').replace('Token ', '')
     res.json({
       user: {
         token,
@@ -130,8 +130,8 @@ export const authRoutes = (app, ajv, prisma) => {
 
   app.put(
     '/api/user',
-    parseJSON,
     requireAuth,
+    parseJSON,
     validateUpdate,
     async (req, res) => {
       const { userId } = req.user
@@ -144,7 +144,6 @@ export const authRoutes = (app, ajv, prisma) => {
           }
         }
       }
-      const token = req.get('Authorization').replace('Token ', '')
       const { email, profile } = await prisma.user.update({
         data,
         where: { userId },
@@ -159,6 +158,7 @@ export const authRoutes = (app, ajv, prisma) => {
           }
         }
       })
+      const token = req.get('Authorization').replace('Token ', '')
       res.json({
         user: {
           token,

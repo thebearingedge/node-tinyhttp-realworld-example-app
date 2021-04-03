@@ -9,11 +9,24 @@ suite('update user: PUT /api/user', test => {
     })
   })
 
-  test('requires a user', async ({ fetch }) => {
+  test('requires a user', async ({ prisma, fetch }) => {
+    const { userId } = await prisma.user.create({
+      data: {
+        email: 'foo@foo.foo',
+        password: await hash('foo'),
+        profile: {
+          create: {
+            username: 'foo'
+          }
+        }
+      }
+    })
+    const token = jwt.sign({ userId }, process.env.TOKEN_SECRET)
     const req = {
       method: 'put',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: `Token ${token}`
       },
       body: JSON.stringify({})
     }

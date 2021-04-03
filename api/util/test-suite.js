@@ -8,7 +8,7 @@ const app = createApi(prisma)
 const server = app.listen()
 const fetch = makeFetch(server)
 
-const entities = ['profile', 'user']
+const entities = ['follow', 'profile', 'user']
 
 export const suite = (suiteName, context, register) => {
   if (typeof register === 'undefined') {
