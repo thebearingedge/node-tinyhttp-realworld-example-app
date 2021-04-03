@@ -13,7 +13,7 @@ export const authRoutes = (app, ajv, prisma) => {
     })
   )
 
-  app.post('/api/user', parseJSON, validateRegistration, async (req, res) => {
+  app.post('/api/users', parseJSON, validateRegistration, async (req, res) => {
     const {
       user: { email, username, password: unhashed }
     } = req.body

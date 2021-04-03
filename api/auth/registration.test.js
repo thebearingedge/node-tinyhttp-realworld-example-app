@@ -1,7 +1,7 @@
 import * as assert from 'uvu/assert'
 import { suite } from '../util/suite.test.js'
 
-suite('registration: POST /api/user', test => {
+suite('registration: POST /api/users', test => {
   test('requires a user', async ({ fetch }) => {
     const req = {
       method: 'post',
@@ -10,7 +10,7 @@ suite('registration: POST /api/user', test => {
       },
       body: JSON.stringify({})
     }
-    await fetch('/api/user', req).expect(422, {
+    await fetch('/api/users', req).expect(422, {
       errors: {
         body: ["must have required property 'user'"]
       }
@@ -27,7 +27,7 @@ suite('registration: POST /api/user', test => {
         user: {}
       })
     }
-    await fetch('/api/user', req).expect(422, {
+    await fetch('/api/users', req).expect(422, {
       errors: {
         body: [
           "must have required property 'username'",
@@ -52,7 +52,7 @@ suite('registration: POST /api/user', test => {
         }
       })
     }
-    const res = await fetch('/api/user', req).expect(201)
+    const res = await fetch('/api/users', req).expect(201)
     const { user } = await res.json()
     assert.is(user.email, 'test@test.test')
     assert.is(user.username, 'test')

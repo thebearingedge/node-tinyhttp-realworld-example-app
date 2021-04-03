@@ -2,7 +2,7 @@ import { hash } from 'argon2'
 import jwt from 'jsonwebtoken'
 import { suite } from '../util/suite.test.js'
 
-suite('follow user: POST /api/profiles/:username/follow', test => {
+suite('unfollow user: DELETE /api/profiles/:username/follow', test => {
   let firstUser
   let secondUser
 
@@ -47,24 +47,30 @@ suite('follow user: POST /api/profiles/:username/follow', test => {
         }
       })
     ])
+    await prisma.follow.create({
+      data: {
+        userId: secondUser.userId,
+        profileId: firstUser.userId
+      }
+    })
   })
 
   test('requires authentication', async ({ fetch }) => {
     const req = {
-      method: 'post'
+      method: 'delete'
     }
     await fetch('/api/profiles/test/follow', req).expect(401, {
       error: 'authentication required'
     })
   })
 
-  test('returns the followed profile', async ({ fetch }) => {
+  test('returns the unfollowed profile', async ({ fetch }) => {
     const token = jwt.sign(
       { userId: secondUser.userId },
       process.env.TOKEN_SECRET
     )
     const req = {
-      method: 'post',
+      method: 'delete',
       headers: {
         Authorization: `Token ${token}`
       }
@@ -72,7 +78,7 @@ suite('follow user: POST /api/profiles/:username/follow', test => {
     await fetch('/api/profiles/foo/follow', req).expect(200, {
       profile: {
         ...firstUser.profile,
-        following: true
+        following: false
       }
     })
   })

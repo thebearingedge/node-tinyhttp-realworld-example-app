@@ -52,16 +52,37 @@ export const profileRoutes = (app, ajv, prisma) => {
           }
         }
       })
-      res.status(201).json({
+      res.json({
         profile: {
           ...profile,
           following: true
         }
       })
     })
-    .delete(
-      '/api/profiles/:username/follow',
-      requireAuth,
-      async (req, res) => {}
-    )
+    .delete('/api/profiles/:username/follow', requireAuth, async (req, res) => {
+      const { userId } = req.user
+      const { username } = req.params
+      const { userId: profileId } = await prisma.profile.findUnique({
+        where: { username },
+        select: { userId: true }
+      })
+      const { profile } = await prisma.follow.delete({
+        where: { profileId_userId: { userId, profileId } },
+        select: {
+          profile: {
+            select: {
+              username: true,
+              bio: true,
+              image: true
+            }
+          }
+        }
+      })
+      res.json({
+        profile: {
+          ...profile,
+          following: false
+        }
+      })
+    })
 }
