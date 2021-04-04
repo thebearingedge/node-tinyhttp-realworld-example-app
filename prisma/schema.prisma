@@ -25,18 +25,19 @@ model User {
 }
 
 model Article {
-  articleId   Int       @id @default(autoincrement())
-  userId      Int
-  slug        String    @unique
-  title       String
-  description String
-  body        String
-  createdAt   DateTime  @default(dbgenerated("now()")) @db.Timestamptz(6)
-  updatedAt   DateTime  @default(dbgenerated("now()")) @db.Timestamptz(6)
-  author      User      @relation(fields: [userId], references: [userId])
-  favoritedBy User[]    @relation("Favorites")
-  tags        Tag[]
-  comments    Comment[]
+  articleId      Int       @id @default(autoincrement())
+  userId         Int
+  slug           String    @unique
+  title          String
+  description    String
+  body           String
+  favoritesCount Int       @default(0)
+  createdAt      DateTime  @default(dbgenerated("now()")) @db.Timestamptz(6)
+  updatedAt      DateTime  @default(dbgenerated("now()")) @db.Timestamptz(6)
+  author         User      @relation(fields: [userId], references: [userId])
+  favoritedBy    User[]    @relation("Favorites")
+  tags           Tag[]
+  comments       Comment[]
 }
 
 model Tag {

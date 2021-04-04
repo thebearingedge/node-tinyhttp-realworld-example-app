@@ -84,6 +84,12 @@ export const articleRoutes = (app, ajv, prisma) => {
           description: true,
           body: true,
           tags: true,
+          createdAt: true,
+          updatedAt: true,
+          favoritesCount: true,
+          favoritedBy: {
+            where: { userId }
+          },
           author: {
             select: {
               username: true,
@@ -104,6 +110,7 @@ export const articleRoutes = (app, ajv, prisma) => {
       }
       const {
         tags,
+        favoritedBy,
         author: { followers, ...author },
         ...article
       } = found
@@ -111,6 +118,7 @@ export const articleRoutes = (app, ajv, prisma) => {
         article: {
           ...article,
           tagList: tags.map(({ value }) => value),
+          favorited: !!favoritedBy.length,
           author: {
             ...author,
             followed: !!followers.length

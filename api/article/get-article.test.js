@@ -61,6 +61,10 @@ suite('get article: GET /api/articles/:slug', test => {
         description: 'Ever wonder how?',
         body: 'You have to believe',
         tagList: [String, String],
+        createdAt: String,
+        updatedAt: String,
+        favorited: false,
+        favoritesCount: 0,
         author: {
           username: 'foo',
           bio: null,
@@ -97,11 +101,60 @@ suite('get article: GET /api/articles/:slug', test => {
         description: 'Ever wonder how?',
         body: 'You have to believe',
         tagList: [String, String],
+        createdAt: String,
+        updatedAt: String,
+        favorited: false,
+        favoritesCount: 0,
         author: {
           username: 'foo',
           bio: null,
           image: null,
           followed: true
+        }
+      }
+    })
+  })
+
+  test('knows if the article is favorited', async ({ prisma, fetch }) => {
+    await prisma.article.update({
+      where: { slug: 'how-to-train-your-dragon' },
+      data: {
+        favoritesCount: 1,
+        favoritedBy: {
+          connect: [
+            {
+              userId: secondUser.userId
+            }
+          ]
+        }
+      }
+    })
+    const req = {
+      headers: {
+        Authorization: `Token ${token}`
+      }
+    }
+    const res = await fetch(
+      '/api/articles/how-to-train-your-dragon',
+      req
+    ).expect(200)
+    const body = await res.json()
+    expect(body).to.have.structure({
+      article: {
+        slug: 'how-to-train-your-dragon',
+        title: 'How to train your dragon',
+        description: 'Ever wonder how?',
+        body: 'You have to believe',
+        tagList: [String, String],
+        createdAt: String,
+        updatedAt: String,
+        favorited: true,
+        favoritesCount: 1,
+        author: {
+          username: 'foo',
+          bio: null,
+          image: null,
+          followed: false
         }
       }
     })
