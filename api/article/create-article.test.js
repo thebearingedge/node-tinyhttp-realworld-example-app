@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken'
-import { Nullable } from 'type-diff'
 import { expect, suite } from '../suite.test.js'
 
 suite('create article: POST /api/articles', test => {
@@ -91,8 +90,8 @@ suite('create article: POST /api/articles', test => {
         favoritesCount: 0,
         author: {
           username: 'test',
-          image: Nullable(String),
-          bio: Nullable(String),
+          image: null,
+          bio: null,
           following: false
         }
       }

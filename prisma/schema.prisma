@@ -33,11 +33,10 @@ model Article {
   body        String
   createdAt   DateTime  @default(dbgenerated("now()")) @db.Timestamptz(6)
   updatedAt   DateTime  @default(dbgenerated("now()")) @db.Timestamptz(6)
-  author      User      @relation(fields: [userUserId], references: [userId])
+  author      User      @relation(fields: [userId], references: [userId])
   favoritedBy User[]    @relation("Favorites")
   tags        Tag[]
   comments    Comment[]
-  userUserId  Int
 }
 
 model Tag {

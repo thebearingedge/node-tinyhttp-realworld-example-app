@@ -26,7 +26,6 @@ export const articleRoutes = (app, ajv, prisma) => {
           ...article
         } = await prisma.article.create({
           data: {
-            userId,
             title,
             slug,
             ...body,
@@ -74,7 +73,51 @@ export const articleRoutes = (app, ajv, prisma) => {
       }
     )
     .get('/api/articles/feed', async (req, res) => {})
-    .get('/api/articles/:slug', async (req, res) => {})
+    .get('/api/articles/:slug', async (req, res) => {
+      const { slug } = req.params
+      const userId = req.user?.userId
+      const found = await prisma.article.findUnique({
+        where: { slug },
+        select: {
+          slug: true,
+          title: true,
+          description: true,
+          body: true,
+          tags: true,
+          author: {
+            select: {
+              username: true,
+              bio: true,
+              image: true,
+              followers: {
+                where: { userId }
+              }
+            }
+          }
+        }
+      })
+      if (!found) {
+        res.status(404).json({
+          error: `cannot find article with slug "${slug}"`
+        })
+        return
+      }
+      const {
+        tags,
+        author: { followers, ...author },
+        ...article
+      } = found
+      res.json({
+        article: {
+          ...article,
+          tagList: tags.map(({ value }) => value),
+          author: {
+            ...author,
+            followed: !!followers.length
+          }
+        }
+      })
+    })
     .put('/api/articles/:slug', async (req, res) => {})
     .delete('/api/articles/:slug', async (req, res) => {})
     .get('/api/articles/:slug/comments', async (req, res) => {})
