@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { json } from 'milliparsec'
 import { hash, verify } from 'argon2'
-import { validateBody } from '../util/validate.js'
-import { requireAuth } from '../util/require-auth.js'
+import { requireAuth, validateBody } from '../util/middleware.js'
 
 const parseJSON = json()
 
@@ -18,33 +17,25 @@ export const authRoutes = (app, ajv, prisma) => {
       user: { email, username, password: unhashed }
     } = req.body
     const password = await hash(unhashed)
-    const { userId, profile } = await prisma.user.create({
+    const { userId, ...user } = await prisma.user.create({
       data: {
         email,
         password,
-        profile: {
-          create: {
-            username
-          }
-        }
+        username
       },
       select: {
         userId: true,
-        profile: {
-          select: {
-            username: true,
-            bio: true,
-            image: true
-          }
-        }
+        email: true,
+        username: true,
+        bio: true,
+        image: true
       }
     })
     const token = jwt.sign({ userId }, process.env.TOKEN_SECRET)
     res.status(201).json({
       user: {
         token,
-        email,
-        ...profile
+        ...user
       }
     })
   })
@@ -59,27 +50,24 @@ export const authRoutes = (app, ajv, prisma) => {
     const {
       user: { email, password: unhashed }
     } = req.body
-    const user = await prisma.user.findUnique({
+    const found = await prisma.user.findUnique({
       where: { email },
       select: {
         userId: true,
+        email: true,
         password: true,
-        profile: {
-          select: {
-            username: true,
-            bio: true,
-            image: true
-          }
-        }
+        username: true,
+        bio: true,
+        image: true
       }
     })
-    if (!user) {
+    if (!found) {
       res.status(401).json({
         error: 'invalid login'
       })
       return
     }
-    const { userId, password: hashed, profile } = user
+    const { userId, password: hashed, ...user } = found
     const isAuthenticated = await verify(hashed, unhashed)
     if (!isAuthenticated) {
       res.status(401).json({
@@ -90,34 +78,28 @@ export const authRoutes = (app, ajv, prisma) => {
     const token = jwt.sign({ userId }, process.env.TOKEN_SECRET)
     res.status(201).json({
       user: {
-        email,
-        token,
-        ...profile
+        ...user,
+        token
       }
     })
   })
 
   app.get('/api/user', requireAuth, async (req, res) => {
     const { userId } = req.user
-    const { email, profile } = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { userId },
       select: {
         email: true,
-        profile: {
-          select: {
-            username: true,
-            bio: true,
-            image: true
-          }
-        }
+        username: true,
+        bio: true,
+        image: true
       }
     })
     const token = req.get('Authorization').replace('Token ', '')
     res.json({
       user: {
         token,
-        email,
-        ...profile
+        ...user
       }
     })
   })
@@ -135,35 +117,21 @@ export const authRoutes = (app, ajv, prisma) => {
     validateUpdate,
     async (req, res) => {
       const { userId } = req.user
-      const { email: _email, ..._profile } = req.body.user
-      const data = {
-        email: _email,
-        profile: {
-          update: {
-            ..._profile
-          }
-        }
-      }
-      const { email, profile } = await prisma.user.update({
-        data,
+      const user = await prisma.user.update({
+        data: req.body.user,
         where: { userId },
         select: {
           email: true,
-          profile: {
-            select: {
-              username: true,
-              bio: true,
-              image: true
-            }
-          }
+          username: true,
+          bio: true,
+          image: true
         }
       })
       const token = req.get('Authorization').replace('Token ', '')
       res.json({
         user: {
-          token,
-          email,
-          ...profile
+          ...user,
+          token
         }
       })
     }

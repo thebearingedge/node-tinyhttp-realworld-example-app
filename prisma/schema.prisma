@@ -11,70 +11,38 @@ generator client {
 }
 
 model User {
-  userId    Int        @id @default(autoincrement())
-  email     String     @unique
+  userId    Int       @id @default(autoincrement())
+  email     String    @unique
   password  String
-  follows   Follow[]
-  profile   Profile?
-  favorites Favorite[]
-}
-
-model Follow {
-  userId    Int
-  profileId Int
-  user      User    @relation(fields: userId, references: userId)
-  profile   Profile @relation(fields: profileId, references: userId)
-
-  @@id([profileId, userId])
-}
-
-model Profile {
-  userId    Int       @unique
   username  String    @unique
   bio       String?
   image     String?
-  user      User      @relation(fields: userId, references: userId)
-  followers Follow[]
+  followers User[]    @relation("Followers", references: [userId])
+  following User[]    @relation("Followers", references: [userId])
   articles  Article[]
   comments  Comment[]
-}
-
-model Favorite {
-  userId    Int
-  articleId Int
-  user      User    @relation(fields: userId, references: userId)
-  article   Article @relation(fields: articleId, references: articleId)
-
-  @@id([userId, articleId])
+  favorites Article[] @relation("Favorites")
 }
 
 model Article {
-  articleId   Int          @id @default(autoincrement())
+  articleId   Int       @id @default(autoincrement())
   userId      Int
-  slug        String       @unique
+  slug        String    @unique
   title       String
   description String
   body        String
-  createdAt   DateTime     @default(dbgenerated("now()")) @db.Timestamptz(6)
-  updatedAt   DateTime     @default(dbgenerated("now()")) @db.Timestamptz(6)
-  author      Profile      @relation(fields: userId, references: userId)
+  createdAt   DateTime  @default(dbgenerated("now()")) @db.Timestamptz(6)
+  updatedAt   DateTime  @default(dbgenerated("now()")) @db.Timestamptz(6)
+  author      User      @relation(fields: [userUserId], references: [userId])
+  favoritedBy User[]    @relation("Favorites")
+  tags        Tag[]
   comments    Comment[]
-  favoritedBy Favorite[]
-  articleTags ArticleTag[]
+  userUserId  Int
 }
 
 model Tag {
-  value       String       @id
-  articleTags ArticleTag[]
-}
-
-model ArticleTag {
-  articleId Int
-  tagValue  String
-  article   Article @relation(fields: articleId, references: articleId)
-  tag       Tag     @relation(fields: tagValue, references: value)
-
-  @@id([articleId, tagValue])
+  value    String    @id
+  articles Article[]
 }
 
 model Comment {
@@ -84,6 +52,6 @@ model Comment {
   articleId Int
   createdAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(6)
   updatedAt DateTime @default(dbgenerated("now()")) @db.Timestamptz(6)
-  author    Profile  @relation(fields: userId, references: userId)
-  article   Article  @relation(fields: articleId, references: articleId)
+  author    User     @relation(fields: [userId], references: [userId])
+  article   Article  @relation(fields: [articleId], references: [articleId])
 }

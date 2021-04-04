@@ -1,4 +1,3 @@
-import { hash } from 'argon2'
 import jwt from 'jsonwebtoken'
 import { suite } from '../util/suite.test.js'
 
@@ -11,27 +10,19 @@ suite('get profile: GET /api/profiles/:username', test => {
       prisma.user.create({
         data: {
           email: 'foo@foo.foo',
-          password: await hash('foo'),
-          profile: {
-            create: {
-              username: 'foo',
-              bio: 'foo',
-              image: 'https://foo.foo'
-            }
-          }
+          password: 'foo',
+          username: 'foo',
+          bio: 'foo',
+          image: 'https://foo.foo'
         }
       }),
       prisma.user.create({
         data: {
           email: 'bar@bar.bar',
-          password: await hash('bar'),
-          profile: {
-            create: {
-              username: 'bar',
-              bio: 'bar',
-              image: 'https://bar.bar'
-            }
-          }
+          password: 'bar',
+          username: 'bar',
+          bio: 'bar',
+          image: 'https://bar.bar'
         }
       })
     ])
@@ -58,10 +49,12 @@ suite('get profile: GET /api/profiles/:username', test => {
     fetch,
     prisma
   }) => {
-    await prisma.follow.create({
+    await prisma.user.update({
+      where: { userId: secondUser.userId },
       data: {
-        userId: secondUser.userId,
-        profileId: firstUser.userId
+        following: {
+          connect: { userId: firstUser.userId }
+        }
       }
     })
     const token = jwt.sign(

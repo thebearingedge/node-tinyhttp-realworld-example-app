@@ -1,11 +1,11 @@
-import { requireAuth } from '../util/require-auth.js'
+import { requireAuth } from '../util/middleware.js'
 
 export const profileRoutes = (app, ajv, prisma) => {
   app
     .get('/api/profiles/:username', async (req, res) => {
       const userId = req.user?.userId
       const { username } = req.params
-      const found = await prisma.profile.findUnique({
+      const found = await prisma.user.findUnique({
         where: { username },
         select: {
           username: true,
@@ -34,20 +34,26 @@ export const profileRoutes = (app, ajv, prisma) => {
     .post('/api/profiles/:username/follow', requireAuth, async (req, res) => {
       const { userId } = req.user
       const { username } = req.params
-      const { userId: profileId } = await prisma.profile.findUnique({
+      const profile = await prisma.user.findUnique({
         where: { username },
-        select: { userId: true }
-      })
-      const { profile } = await prisma.follow.upsert({
-        where: { profileId_userId: { userId, profileId } },
-        create: { userId, profileId },
-        update: { userId, profileId },
         select: {
-          profile: {
-            select: {
-              username: true,
-              bio: true,
-              image: true
+          username: true,
+          bio: true,
+          image: true
+        }
+      })
+      if (!profile) {
+        res.status(404).json({
+          error: `cannot find profile with username "${username}"`
+        })
+        return
+      }
+      await prisma.user.update({
+        where: { username },
+        data: {
+          followers: {
+            connect: {
+              userId
             }
           }
         }
@@ -62,18 +68,26 @@ export const profileRoutes = (app, ajv, prisma) => {
     .delete('/api/profiles/:username/follow', requireAuth, async (req, res) => {
       const { userId } = req.user
       const { username } = req.params
-      const { userId: profileId } = await prisma.profile.findUnique({
+      const profile = await prisma.user.findUnique({
         where: { username },
-        select: { userId: true }
-      })
-      const { profile } = await prisma.follow.delete({
-        where: { profileId_userId: { userId, profileId } },
         select: {
-          profile: {
-            select: {
-              username: true,
-              bio: true,
-              image: true
+          username: true,
+          bio: true,
+          image: true
+        }
+      })
+      if (!profile) {
+        res.status(404).json({
+          error: `cannot find profile with username "${username}"`
+        })
+        return
+      }
+      await prisma.user.update({
+        where: { username },
+        data: {
+          followers: {
+            disconnect: {
+              userId
             }
           }
         }

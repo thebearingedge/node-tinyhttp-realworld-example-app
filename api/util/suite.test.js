@@ -15,7 +15,7 @@ const app = createApi({ ajv, prisma })
 const server = app.listen()
 const fetch = makeFetch(server)
 
-const entities = ['articleTag', 'tag', 'article', 'follow', 'profile', 'user']
+const entities = ['tag', 'comment', 'article', 'user']
 
 export { expect }
 

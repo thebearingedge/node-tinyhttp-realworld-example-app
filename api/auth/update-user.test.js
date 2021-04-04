@@ -1,4 +1,3 @@
-import { hash } from 'argon2'
 import jwt from 'jsonwebtoken'
 import { suite } from '../util/suite.test.js'
 
@@ -10,18 +9,7 @@ suite('update user: PUT /api/user', test => {
   })
 
   test('requires a user', async ({ prisma, fetch }) => {
-    const { userId } = await prisma.user.create({
-      data: {
-        email: 'foo@foo.foo',
-        password: await hash('foo'),
-        profile: {
-          create: {
-            username: 'foo'
-          }
-        }
-      }
-    })
-    const token = jwt.sign({ userId }, process.env.TOKEN_SECRET)
+    const token = jwt.sign({ userId: 1 }, process.env.TOKEN_SECRET)
     const req = {
       method: 'put',
       headers: {
@@ -41,12 +29,8 @@ suite('update user: PUT /api/user', test => {
     const { userId } = await prisma.user.create({
       data: {
         email: 'foo@foo.foo',
-        password: await hash('foo'),
-        profile: {
-          create: {
-            username: 'foo'
-          }
-        }
+        password: 'foo',
+        username: 'foo'
       }
     })
     const token = jwt.sign({ userId }, process.env.TOKEN_SECRET)

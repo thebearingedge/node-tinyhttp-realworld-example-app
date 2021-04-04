@@ -1,7 +1,6 @@
 import slugify from 'slugify'
 import { json } from 'milliparsec'
-import { validateBody } from '../util/validate.js'
-import { requireAuth } from '../util/require-auth.js'
+import { requireAuth, validateBody } from '../util/middleware.js'
 
 export const articleRoutes = (app, ajv, prisma) => {
   const validateNewArticle = validateBody(
@@ -23,7 +22,6 @@ export const articleRoutes = (app, ajv, prisma) => {
         } = req.body
         const slug = slugify(title, { lower: true })
         const {
-          articleId,
           author: { followers, ...author },
           ...article
         } = await prisma.article.create({
@@ -31,10 +29,18 @@ export const articleRoutes = (app, ajv, prisma) => {
             userId,
             title,
             slug,
-            ...body
+            ...body,
+            author: {
+              connect: { userId }
+            },
+            tags: {
+              connectOrCreate: tagList.map(value => ({
+                where: { value },
+                create: { value }
+              }))
+            }
           },
           select: {
-            articleId: true,
             title: true,
             description: true,
             slug: true,
@@ -52,17 +58,6 @@ export const articleRoutes = (app, ajv, prisma) => {
               }
             }
           }
-        })
-        await prisma.tag.createMany({
-          data: tagList.map(value => ({ value })),
-          skipDuplicates: true
-        })
-        await prisma.articleTag.createMany({
-          data: tagList.map(value => ({
-            tagValue: value,
-            articleId
-          })),
-          skipDuplicates: true
         })
         res.status(201).json({
           article: {

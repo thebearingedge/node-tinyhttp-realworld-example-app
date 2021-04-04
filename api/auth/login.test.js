@@ -2,6 +2,12 @@ import { hash } from 'argon2'
 import { suite, expect } from '../util/suite.test.js'
 
 suite('login: POST /api/users/login', test => {
+  let hashedPassword
+
+  test.before(async () => {
+    hashedPassword = await hash('test')
+  })
+
   test('requires a user', async ({ fetch }) => {
     const req = {
       method: 'post',
@@ -59,12 +65,8 @@ suite('login: POST /api/users/login', test => {
     await prisma.user.create({
       data: {
         email: 'test@test.test',
-        password: await hash('test'),
-        profile: {
-          create: {
-            username: 'test'
-          }
-        }
+        username: 'test',
+        password: hashedPassword
       }
     })
     const req = {
@@ -88,12 +90,8 @@ suite('login: POST /api/users/login', test => {
     await prisma.user.create({
       data: {
         email: 'test@test.test',
-        password: await hash('test'),
-        profile: {
-          create: {
-            username: 'test'
-          }
-        }
+        username: 'test',
+        password: hashedPassword
       }
     })
     const req = {
