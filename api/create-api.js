@@ -2,7 +2,6 @@ import Ajv from 'ajv'
 import { App } from '@tinyhttp/app'
 import { jwt } from '@tinyhttp/jwt'
 import { cors } from '@tinyhttp/cors'
-import { tagRoutes } from './tag/tag-routes.js'
 import { authRoutes } from './auth/auth-routes.js'
 import { profileRoutes } from './profile/profile-routes.js'
 import { articleRoutes } from './article/article-routes.js'
@@ -24,7 +23,6 @@ export function createApi({ prisma, ajv }) {
   authRoutes(app, ajv, prisma)
   profileRoutes(app, ajv, prisma)
   articleRoutes(app, ajv, prisma)
-  tagRoutes(app, ajv, prisma)
 
   return app
 }

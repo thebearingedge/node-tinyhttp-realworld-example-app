@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { suite } from '../util/suite.test.js'
+import { suite } from '../suite.test.js'
 
 suite('current user: GET /api/user', test => {
   test('requires authentication', async ({ fetch }) => {

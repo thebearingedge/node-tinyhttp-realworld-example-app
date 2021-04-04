@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { Nullable } from 'type-diff'
-import { expect, suite } from '../util/suite.test.js'
+import { expect, suite } from '../suite.test.js'
 
 suite('create article: POST /api/articles', test => {
   test('requires authentication', async ({ fetch }) => {

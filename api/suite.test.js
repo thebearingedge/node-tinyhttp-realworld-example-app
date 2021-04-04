@@ -3,16 +3,15 @@ import chai from 'chai'
 import { chaiStruct } from 'chai-struct'
 import { suite as uvuSuite } from 'uvu'
 import { makeFetch } from 'supertest-fetch'
-import { ajv } from './ajv-swagger.js'
-import { createApi } from '../create-api.js'
+import { ajv } from './util/ajv-swagger.js'
+import { createApi } from './create-api.js'
 
 chai.use(chaiStruct)
 
 const { expect } = chai
 
 const prisma = new Prisma.PrismaClient()
-const app = createApi({ ajv, prisma })
-const server = app.listen()
+const server = createApi({ ajv, prisma }).listen()
 const fetch = makeFetch(server)
 
 const entities = ['tag', 'comment', 'article', 'user']

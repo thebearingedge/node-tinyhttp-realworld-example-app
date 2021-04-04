@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { suite } from '../util/suite.test.js'
+import { suite } from '../suite.test.js'
 
 suite('unfollow user: DELETE /api/profiles/:username/follow', test => {
   let firstUser

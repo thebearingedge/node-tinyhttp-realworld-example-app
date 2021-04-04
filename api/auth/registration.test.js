@@ -1,4 +1,4 @@
-import { suite, expect } from '../util/suite.test.js'
+import { suite, expect } from '../suite.test.js'
 
 const method = 'POST'
 const url = '/api/users'

@@ -1,5 +1,5 @@
 import { hash } from 'argon2'
-import { suite, expect } from '../util/suite.test.js'
+import { suite, expect } from '../suite.test.js'
 
 suite('login: POST /api/users/login', test => {
   let hashedPassword
