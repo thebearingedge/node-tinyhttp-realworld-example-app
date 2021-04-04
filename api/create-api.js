@@ -1,8 +1,4 @@
-import fs from 'fs'
 import Ajv from 'ajv'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import ajvErrors from 'ajv-errors'
 import { App } from '@tinyhttp/app'
 import { jwt } from '@tinyhttp/jwt'
 import { cors } from '@tinyhttp/cors'
@@ -11,35 +7,7 @@ import { authRoutes } from './auth/auth-routes.js'
 import { profileRoutes } from './profile/profile-routes.js'
 import { articleRoutes } from './article/article-routes.js'
 
-const pathToSwaggerJSON = fileURLToPath(path.dirname(import.meta.url))
-const swaggerJSON = fs.readFileSync(
-  path.join(pathToSwaggerJSON, 'swagger.json'),
-  'utf8'
-)
-const swagger = JSON.parse(swaggerJSON)
-const ajv = ajvErrors(
-  new Ajv({
-    allErrors: true,
-    removeAdditional: true,
-    keywords: [
-      'swagger',
-      'info',
-      'basePath',
-      'schemes',
-      'produces',
-      'consumes',
-      'securityDefinitions',
-      'paths'
-    ],
-    formats: {
-      password: val => !!val.length
-    }
-  })
-)
-
-ajv.addSchema(swagger, 'swagger.json')
-
-export function createApi(prisma) {
+export function createApi({ prisma, ajv }) {
   const app = new App({
     onError,
     noMatchHandler

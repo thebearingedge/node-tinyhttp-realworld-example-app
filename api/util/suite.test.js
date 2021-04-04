@@ -1,14 +1,23 @@
 import Prisma from '@prisma/client'
+import chai from 'chai'
+import { chaiStruct } from 'chai-struct'
 import { suite as uvuSuite } from 'uvu'
 import { makeFetch } from 'supertest-fetch'
+import { ajv } from './ajv-swagger.js'
 import { createApi } from '../create-api.js'
 
+chai.use(chaiStruct)
+
+const { expect } = chai
+
 const prisma = new Prisma.PrismaClient()
-const app = createApi(prisma)
+const app = createApi({ ajv, prisma })
 const server = app.listen()
 const fetch = makeFetch(server)
 
-const entities = ['follow', 'profile', 'user']
+const entities = ['articleTag', 'tag', 'article', 'follow', 'profile', 'user']
+
+export { expect }
 
 export const suite = (suiteName, context, register) => {
   if (typeof register === 'undefined') {
