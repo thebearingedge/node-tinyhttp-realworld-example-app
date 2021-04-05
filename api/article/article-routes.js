@@ -52,7 +52,8 @@ export const articleRoutes = (app, ajv, prisma) => {
                 image: true,
                 bio: true,
                 followers: {
-                  where: { userId }
+                  where: { userId },
+                  select: { userId: true }
                 }
               }
             }
@@ -72,7 +73,6 @@ export const articleRoutes = (app, ajv, prisma) => {
         })
       }
     )
-    .get('/api/articles/feed', async (req, res) => {})
     .get('/api/articles/:slug', async (req, res) => {
       const { slug } = req.params
       const userId = req.user?.userId
@@ -88,7 +88,8 @@ export const articleRoutes = (app, ajv, prisma) => {
           updatedAt: true,
           favoritesCount: true,
           favoritedBy: {
-            where: { userId }
+            where: { userId },
+            select: { userId: true }
           },
           author: {
             select: {
@@ -96,7 +97,8 @@ export const articleRoutes = (app, ajv, prisma) => {
               bio: true,
               image: true,
               followers: {
-                where: { userId }
+                where: { userId },
+                select: { userId: true }
               }
             }
           }
@@ -126,11 +128,133 @@ export const articleRoutes = (app, ajv, prisma) => {
         }
       })
     })
+
+    .post('/api/articles/:slug/favorite', requireAuth, async (req, res) => {
+      const { userId } = req.user
+      const { slug } = req.params
+      const found = await prisma.article.findUnique({
+        where: { slug },
+        select: { articleId: true }
+      })
+      if (!found) {
+        res.status(404).json({
+          error: `cannot find article with slug "${slug}"`
+        })
+        return
+      }
+      const {
+        tags,
+        author: { followers, ...author },
+        ...article
+      } = await prisma.article.update({
+        where: { slug },
+        data: {
+          favoritesCount: {
+            increment: 1
+          },
+          favoritedBy: {
+            connect: { userId }
+          }
+        },
+        select: {
+          slug: true,
+          title: true,
+          description: true,
+          body: true,
+          tags: true,
+          createdAt: true,
+          updatedAt: true,
+          favoritesCount: true,
+          author: {
+            select: {
+              username: true,
+              bio: true,
+              image: true,
+              followers: {
+                where: { userId },
+                select: { userId: true }
+              }
+            }
+          }
+        }
+      })
+      res.status(200).json({
+        article: {
+          ...article,
+          favorited: true,
+          tagList: tags.map(({ value }) => value),
+          author: {
+            ...author,
+            following: !!followers.length
+          }
+        }
+      })
+    })
+    .delete('/api/articles/:slug/unfavorite', requireAuth, async (req, res) => {
+      const { userId } = req.user
+      const { slug } = req.params
+      const found = await prisma.article.findUnique({
+        where: { slug },
+        select: { articleId: true }
+      })
+      if (!found) {
+        res.status(404).json({
+          error: `cannot find article with slug "${slug}"`
+        })
+        return
+      }
+      const {
+        tags,
+        author: { followers, ...author },
+        ...article
+      } = await prisma.article.update({
+        where: { slug },
+        data: {
+          favoritesCount: {
+            decrement: 1
+          },
+          favoritedBy: {
+            disconnect: { userId }
+          }
+        },
+        select: {
+          slug: true,
+          title: true,
+          description: true,
+          body: true,
+          tags: true,
+          createdAt: true,
+          updatedAt: true,
+          favoritesCount: true,
+          author: {
+            select: {
+              username: true,
+              bio: true,
+              image: true,
+              followers: {
+                where: { userId },
+                select: { userId: true }
+              }
+            }
+          }
+        }
+      })
+      res.status(200).json({
+        article: {
+          ...article,
+          favorited: false,
+          tagList: tags.map(({ value }) => value),
+          author: {
+            ...author,
+            following: !!followers.length
+          }
+        }
+      })
+    })
     .put('/api/articles/:slug', async (req, res) => {})
     .delete('/api/articles/:slug', async (req, res) => {})
     .get('/api/articles/:slug/comments', async (req, res) => {})
     .post('/api/articles/:slug/comments', async (req, res) => {})
     .delete('/api/articles/:slug/comments/:id', async (req, res) => {})
-    .post('/api/articles/:slug/favorite', async (req, res) => {})
-    .delete('/api/articles/:slug/favorite', async (req, res) => {})
+    .get('/api/articles/feed', async (req, res) => {})
 }
