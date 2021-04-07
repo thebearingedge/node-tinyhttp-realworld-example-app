@@ -46,12 +46,12 @@ suite('favorite article: POST', test => {
     const req = {
       method: 'delete'
     }
-    await fetch(
-      '/api/articles/how-to-train-your-dragon/unfavorite',
-      req
-    ).expect(401, {
-      error: 'authentication required'
-    })
+    await fetch('/api/articles/how-to-train-your-dragon/favorite', req).expect(
+      401,
+      {
+        error: 'authentication required'
+      }
+    )
   })
 
   test('requires an existing article', async ({ fetch }) => {
@@ -61,7 +61,7 @@ suite('favorite article: POST', test => {
         Authorization: `Token ${token}`
       }
     }
-    await fetch('/api/articles/how-to/unfavorite', req).expect(404, {
+    await fetch('/api/articles/how-to/favorite', req).expect(404, {
       error: 'cannot find article with slug "how-to"'
     })
   })
@@ -74,7 +74,7 @@ suite('favorite article: POST', test => {
       }
     }
     const res = await fetch(
-      '/api/articles/how-to-train-your-dragon/unfavorite',
+      '/api/articles/how-to-train-your-dragon/favorite',
       req
     ).expect(200)
     const body = await res.json()

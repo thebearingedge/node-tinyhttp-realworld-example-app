@@ -190,71 +190,67 @@ export const articleRoutes = (app, ajv, prisma) => {
     })
   })
 
-  app.delete(
-    '/api/articles/:slug/unfavorite',
-    requireAuth,
-    async (req, res) => {
-      const { userId } = req.user
-      const { slug } = req.params
-      const found = await prisma.article.findUnique({
-        where: { slug },
-        select: { articleId: true }
+  app.delete('/api/articles/:slug/favorite', requireAuth, async (req, res) => {
+    const { userId } = req.user
+    const { slug } = req.params
+    const found = await prisma.article.findUnique({
+      where: { slug },
+      select: { articleId: true }
+    })
+    if (!found) {
+      res.status(404).json({
+        error: `cannot find article with slug "${slug}"`
       })
-      if (!found) {
-        res.status(404).json({
-          error: `cannot find article with slug "${slug}"`
-        })
-        return
-      }
-      const {
-        tags,
-        author: { followers, ...author },
-        ...article
-      } = await prisma.article.update({
-        where: { slug },
-        data: {
-          favoritesCount: {
-            decrement: 1
-          },
-          favoritedBy: {
-            disconnect: { userId }
-          }
+      return
+    }
+    const {
+      tags,
+      author: { followers, ...author },
+      ...article
+    } = await prisma.article.update({
+      where: { slug },
+      data: {
+        favoritesCount: {
+          decrement: 1
         },
-        select: {
-          slug: true,
-          title: true,
-          description: true,
-          body: true,
-          tags: true,
-          createdAt: true,
-          updatedAt: true,
-          favoritesCount: true,
-          author: {
-            select: {
-              username: true,
-              bio: true,
-              image: true,
-              followers: {
-                where: { userId },
-                select: { userId: true }
-              }
+        favoritedBy: {
+          disconnect: { userId }
+        }
+      },
+      select: {
+        slug: true,
+        title: true,
+        description: true,
+        body: true,
+        tags: true,
+        createdAt: true,
+        updatedAt: true,
+        favoritesCount: true,
+        author: {
+          select: {
+            username: true,
+            bio: true,
+            image: true,
+            followers: {
+              where: { userId },
+              select: { userId: true }
             }
           }
         }
-      })
-      res.json({
-        article: {
-          ...article,
-          favorited: false,
-          tagList: tags.map(({ value }) => value),
-          author: {
-            ...author,
-            following: !!followers.length
-          }
+      }
+    })
+    res.json({
+      article: {
+        ...article,
+        favorited: false,
+        tagList: tags.map(({ value }) => value),
+        author: {
+          ...author,
+          following: !!followers.length
         }
-      })
-    }
-  )
+      }
+    })
+  })
 
   const validateUpdateArticle = validateBody(
     ajv.compile({
@@ -280,16 +276,19 @@ export const articleRoutes = (app, ajv, prisma) => {
           })
           return
         }
+        const data = {
+          ...req.body.article
+        }
+        if (req.body.article.title) {
+          data.slug = slugify(req.body.article.title, { lower: true })
+        }
         const {
           tags,
           author: { followers, ...author },
           ...article
         } = await prisma.article.update({
           where: { slug },
-          data: {
-            ...req.body.article,
-            slug: slugify(req.body.article.title, { lower: true })
-          },
+          data,
           select: {
             slug: true,
             title: true,
