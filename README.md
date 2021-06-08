@@ -18,4 +18,4 @@ This codebase was created to demonstrate a fully fledged fullstack application b
 
 ## Contribution
 
-Please see CONTRIBUTING
+Please see [CONTRIBUTING](https://github.com/thebearingedge/node-tinyhttp-realworld-example-app/blob/master/CONTRIBUTING.md)
