@@ -37,10 +37,10 @@ jobs:
         run: npm install
 
       - name: Lint check
-        run: npm lint
+        run: npm run lint
 
       - name: Postgres Test
-        run: npm cover
+        run: npm run cover
         env:
           DATABASE_URL: postgresql://admin:password@localhost/realworld
           TOKEN_SECRET: 881A08FD732052323526265B87FAD0D7DA192196C46F5367E9D0C9152110A7F4
