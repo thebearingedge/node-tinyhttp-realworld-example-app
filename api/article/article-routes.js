@@ -466,7 +466,15 @@ export const articleRoutes = (app, ajv, prisma) => {
           createdAt: true,
           updatedAt: true,
           body: true,
-          author: true
+          author: {
+            select: {
+              username: true,
+              bio: true,
+              image: true
+              // @TODO: add following logic
+              // following: true
+            }
+          }
         }
       })
       res.status(200).json({
@@ -475,7 +483,32 @@ export const articleRoutes = (app, ajv, prisma) => {
     }
   )
 
-  app.delete('/api/articles/:slug/comments/:id', async (req, res) => {})
+  app.delete(
+    '/api/articles/:slug/comments/:id',
+    requireAuth,
+    async (req, res) => {
+      const { id, slug } = req.params
+
+      const found = await prisma.article.findUnique({
+        where: { slug },
+        select: { articleId: true }
+      })
+      if (!found) {
+        res.status(404).json({
+          error: `cannot find article with slug "${slug}"`
+        })
+        return
+      }
+
+      await prisma.comment.delete({
+        where: {
+          articleId: found.articleId,
+          id
+        }
+      })
+      res.sendStatus(200)
+    }
+  )
 
   app.get('/api/articles/feed', async (req, res) => {})
 }
