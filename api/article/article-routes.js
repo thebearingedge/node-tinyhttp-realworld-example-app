@@ -8,6 +8,64 @@ export const articleRoutes = (app, ajv, prisma) => {
     })
   )
 
+  app.get('/api/articles', async (req, res) => {
+    // @TODO: Add favorited from req.query
+    const { tag, author, limit, offset } = req.query
+
+    const found = await prisma.article.findMany({
+      take: Number(limit) || 20,
+      skip: Number(offset) || 0,
+      where: {
+        tags: {
+          some: {
+            value: tag
+          }
+        },
+        author: {
+          is: {
+            username: author
+          }
+        }
+      },
+      select: {
+        slug: true,
+        title: true,
+        description: true,
+        body: true,
+        tags: true,
+        createdAt: true,
+        updatedAt: true,
+        favoritesCount: true,
+        // @TODO: If a users is logged in, check whether or not they favorited this article.
+        // favorited: boolean
+        author: {
+          select: {
+            username: true,
+            bio: true,
+            image: true
+            // @TODO: If a users is logged in, check whether or not they follow this author.
+            // following: boolean
+          }
+        }
+      }
+    })
+    res.status(201).json({
+      articles: found.map(
+        ({ slug, title, description, body, tags, ...article }) => {
+          return {
+            slug,
+            title,
+            description,
+            body,
+            tagList: tags.map(({ value }) => value),
+            ...article
+          }
+        }
+      ),
+      articlesCount: found.length
+    })
+  })
+
   app.post(
     '/api/articles',
     requireAuth,
