@@ -7,11 +7,11 @@
   "scripts": {
     "start": "node .",
     "dev": "nodemon -w index.js -w api/ .",
-    "lint": "eslint . --fix && prettier --write \"./**/*.js\"",
+    "lint": "eslint . --fix --ignore-path .gitignore && prettier --ignore-path .gitignore --write \"./**/*.js\"",
     "lint:staged": "lint-staged",
     "test": "uvu api/ '\\.test\\.js$'",
     "tdd": "npm -s t; watchlist api/ -- npm -s t",
-    "cover": "c8 -a -r text -r html -n api/ npm -s t",
+    "cover": "c8 -a -r text -r html -r lcovonly -n api/ npm -s t",
     "db:start": "docker compose up -d --build",
     "db:stop": "docker compose down",
     "db:push": "prisma --preview-feature db push",
