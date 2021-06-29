@@ -36,6 +36,9 @@ jobs:
       - name: Installling dependencies
         run: npm install
 
+      - name: Rebuild Argon2
+        run: npm rebuild argon2 --build-from-source
+
       - name: Lint check
         run: npm run lint
 
@@ -50,7 +53,7 @@ jobs:
           DATABASE_URL: postgresql://admin:password@postgres:5432/realworld
           TOKEN_SECRET: 881A08FD732052323526265B87FAD0D7DA192196C46F5367E9D0C9152110A7F4
           PORT: 3000
-      
+
       # Remove this comment when merged
       #- name: Upload to Codecov
       #  run: bash <(curl -s https://codecov.io/bash)
